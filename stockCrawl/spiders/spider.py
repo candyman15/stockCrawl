@@ -1,8 +1,12 @@
-from scrapy.spider import Spider
+
+from scrapy.spider import CrawlSpider
 from scrapy.selector import Selector
 from stockCrawl.items import CrawlItem
 
-class StockSpider(Spider):
+
+
+
+class StockSpider(CrawlSpider):
     pipelines = ['stock']
     name = "stock"
     allowed_domains = ["finance.daum.net"]

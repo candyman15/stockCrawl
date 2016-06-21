@@ -18,23 +18,15 @@ class SQLStorePipeline(object):
        self.cursor = self.mariadb_connection.cursor()
 
 
-    def process_item(self, items, spider):
-        if 'stock' in getattr(spider, 'pipelines', [])[0]:
-            #print ("Item -------------------------------------------------------" + CrawlItem.items)
-            for item in items:
-                try:
-                    #if data is ():
+    def process_item(self, item, spider):
+        stock_id = self._get_id(item)
+        self.cursor.execute(
+            "INSERT INTO TABLE_STOCK_CODE(STOCK_CODE,STOCK_NAME,CREATE_DATE) VALUES (%s, %s, %s);",
+            (item['stock_id'][0],
+             item['stock_name'][0],
+             datetime.datetime.now()
+             ))
+        self.mariadb_connection.commit()
 
-                        self.cursor.execute(
-                            "INSERT INTO TABLE_STOCK_CODE(STOCK_CODE,STOCK_NAME,CREATE_DATE) VALUES (%s, %s, %s);",
-                            (item['stock_id'],
-                             item['stock_name'],
-                             datetime.datetime.now()
-                             ))
-                        self.mariadb_connection.commit()
-                    #else:
-                    #    return items
-                except mariadb.Error, e:
-                    print ("MySQL Error -------------------------------------------------------")
-                    print (e)
-
+    def _get_id(self, item):
+        return item['stock_id'][0]
