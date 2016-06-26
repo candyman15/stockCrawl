@@ -18,14 +18,14 @@ class StockSpider(CrawlSpider):
     def parse(self, response):
         hxs = Selector(response)
 
-        sites = hxs.xpath('//table[@class="gTable clr"]')
+        sites = hxs.xpath('//table[@class="gTable clr"]/tr')
         items = []
 
         for site in sites:
             item = CrawlItem()
-            href = site.xpath('//td[@class="txt"]/a/@href').extract()
+            href = site.xpath('td[@class="txt"]/a/@href').extract()
             item['stock_id'] = [i.split('=')[1] for i in href]
-            item['stock_name'] = site.xpath('//td[@class="txt"]/a//text()').extract()
+            item['stock_name'] = site.xpath('td[@class="txt"]/a//text()').extract()
             items.append(item)
 
         return items

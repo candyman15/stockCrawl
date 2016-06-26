@@ -26,14 +26,18 @@ class SQLStorePipeline(object):
 
     def process_item(self, item, spider):
         # create record if doesn't exist.
-        self.cursor.execute(
-            "select * from TABLE_STOCK_CODE where STOCK_CODE = %s",
-            (item['stock_id'][0].encode('utf-8')))
+        sql = "SELECT * FROM TABLE_STOCK_CODE WHERE STOCK_CODE = '%s'" % (item['stock_id'][0].encode('utf-8'))
+        self.cursor.execute(sql)
         result = self.cursor.fetchone()
         # print "select * from apt2u.apt where aptname = '%s' and link = 'http://www.apt2you.com/houseSaleDetailInfo.do?manageNo=%s' and company = '%s' and receiptdate = '%s' and result_date = '%s'" % (item['aptname'][0].encode('utf-8'), item['link'][0].encode('utf-8'), item['company'][0].encode('utf-8'), item['receiptdate'][0].encode('utf-8'), item['result_date'][0].encode('utf-8'))
 
         if result:
-            print("data already exist")
+            self.cursor.execute(
+                """update TABLE_STOCK_CODE set STOCK_NAME=%s, CREATE_DATE=%s WHERE STOCK_CODE = %s""",
+                (item['stock_name'][0].encode('utf-8'),
+                 datetime.datetime.now(),
+                 item['stock_id'][0].encode('utf-8')))
+            self.conn.commit()
         else:
             try:
                 self.cursor.execute(
